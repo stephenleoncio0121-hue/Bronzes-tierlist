@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>MC Tier System</title>
+
+  <style>
+    body{
+      margin:0;
+      font-family:Arial;
+      background:#0a0f1f;
+      color:white;
+    }
+
+    /* SIDEBAR */
+    .sidebar{
+      position:fixed;
+      left:0;
+      top:0;
+      width:220px;
+      height:100%;
+      background:#0f172a;
+      padding:15px;
+    }
+
+    .sidebar h2{
+      color:#a855f7;
+      margin-bottom:20px;
+    }
+
+    .sidebar button{
+      width:100%;
+      margin:5px 0;
+      padding:10px;
+      border:none;
+      border-radius:10px;
+      background:#111827;
+      color:white;
+      cursor:pointer;
+    }
+
+    .sidebar button:hover{
+      background:#1f2937;
+    }
+
+    /* MAIN */
+    .main{
+      margin-left:240px;
+      padding:20px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+      gap:15px;
+    }
+
+    .card{
+      background:rgba(255,255,255,0.05);
+      border:1px solid rgba(255,255,255,0.1);
+      border-radius:16px;
+      padding:15px;
+      backdrop-filter:blur(10px);
+    }
+
+    h3{
+      color:#a855f7;
+    }
+
+    input,select{
+      width:90%;
+      padding:10px;
+      margin:5px;
+      border-radius:10px;
+      border:none;
+      background:#0f172a;
+      color:white;
+    }
+
+    button{
+      padding:10px;
+      margin:5px;
+      border:none;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:bold;
+    }
+
+    .green{background:#22c55e;color:white;}
+    .red{background:#ef4444;color:white;}
+    .blue{background:#3b82f6;color:white;}
+
+    ul{list-style:none;padding:0;}
+
+    li{
+      background:rgba(255,255,255,0.06);
+      margin:5px;
+      padding:10px;
+      border-radius:10px;
+    }
+
+    .tag{
+      display:inline-block;
+      padding:3px 8px;
+      margin:2px;
+      border-radius:8px;
+      font-size:11px;
+      background:#334155;
+    }
+
+    .Owner{background:gold;color:black;}
+    .Manager{background:orange;color:black;}
+    .Admin{background:red;}
+    .Tester{background:#3b82f6;}
+  </style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <h2>🏆 MC Tiers</h2>
+  <button onclick="show('requests')">Requests</button>
+  <button onclick="show('queue')">Queue</button>
+  <button onclick="show('panel')">Tester Panel</button>
+  <button onclick="show('roles')">Role Manager</button>
+  <button onclick="show('leaderboard')">Leaderboard</button>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- REQUESTS -->
+<div id="requests" class="grid">
+
+  <div class="card">
+    <h3>📩 Submit Request</h3>
+    <input id="reqName" placeholder="Player Name">
+    <button class="green" onclick="submitReq()">Submit</button>
+    <ul id="reqList"></ul>
+  </div>
+
+</div>
+
+<!-- QUEUE -->
+<div id="queue" class="grid" style="display:none">
+
+  <div class="card">
+    <h3>🎮 Queue</h3>
+
+    <input id="qName" placeholder="Player Name">
+
+    <select id="qMode">
+      <option>Sword</option>
+      <option>Cpvp</option>
+      <option>Mace</option>
+      <option>SMP</option>
+      <option>Pot</option>
+      <option>NethPot</option>
+      <option>Lifesteal</option>
+    </select>
+
+    <button class="green" onclick="joinQueue()">Join Queue</button>
+
+    <ul id="queueList"></ul>
+  </div>
+
+</div>
+
+<!-- PANEL -->
+<div id="panel" class="grid" style="display:none">
+
+  <div class="card">
+    <h3>⚔ Tester Panel</h3>
+
+    <input id="pName" placeholder="Player Name">
+    <input id="pElo" placeholder="Elo">
+
+    <select id="role">
+      <option>Tester</option>
+      <option>Admin</option>
+      <option>Manager</option>
+      <option>Owner</option>
+    </select>
+
+    <select id="mode">
+      <option>Sword</option>
+      <option>Cpvp</option>
+      <option>Mace</option>
+      <option>SMP</option>
+      <option>Pot</option>
+      <option>NethPot</option>
+      <option>Lifesteal</option>
+    </select>
+
+    <button class="red" onclick="addPlayer('HT')">HT</button>
+    <button class="blue" onclick="addPlayer('LT')">LT</button>
+  </div>
+
+</div>
+
+<!-- ROLE MANAGER -->
+<div id="roles" class="grid" style="display:none">
+
+  <div class="card">
+    <h3>🛠 Role Manager</h3>
+
+    <input id="targetName" placeholder="Player Name">
+
+    <select id="newRole">
+      <option>Tester</option>
+      <option>Admin</option>
+      <option>Manager</option>
+      <option>Owner</option>
+    </select>
+
+    <button class="green" onclick="setRole()">Update Role</button>
+  </div>
+
+</div>
+
+<!-- LEADERBOARD -->
+<div id="leaderboard" class="grid" style="display:none">
+
+  <div class="card">
+    <h3>📊 Leaderboard</h3>
+    <ul id="board"></ul>
+  </div>
+
+</div>
+
+</div>
+
+<script>
+
+let requests = JSON.parse(localStorage.getItem("requests")) || [];
+let queue = JSON.parse(localStorage.getItem("queue")) || [];
+let leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
+
+let myRole = "Owner";
+
+function save(){
+  localStorage.setItem("requests",JSON.stringify(requests));
+  localStorage.setItem("queue",JSON.stringify(queue));
+  localStorage.setItem("leaderboard",JSON.stringify(leaderboard));
+}
+
+/* NAV */
+function show(tab){
+  document.querySelectorAll(".main > div").forEach(d=>d.style.display="none");
+  document.getElementById(tab).style.display="grid";
+}
+
+/* REQUESTS */
+function submitReq(){
+  let name=document.getElementById("reqName").value;
+  if(!name)return alert("Enter name");
+  requests.push(name);
+  save();
+  renderReq();
+}
+
+function renderReq(){
+  let list=document.getElementById("reqList");
+  list.innerHTML="";
+  requests.forEach((n,i)=>{
+    let li=document.createElement("li");
+    li.innerHTML=`${n} <button class="green" onclick="accept(${i})">Accept</button>`;
+    list.appendChild(li);
+  });
+}
+
+function accept(i){
+  document.getElementById("pName").value=requests[i];
+  requests.splice(i,1);
+  save();
+  renderReq();
+}
+
+/* QUEUE */
+function joinQueue(){
+  let name=document.getElementById("qName").value;
+  let mode=document.getElementById("qMode").value;
+  if(!name)return;
+  queue.push({name,mode});
+  save();
+  renderQueue();
+}
+
+function renderQueue(){
+  let list=document.getElementById("queueList");
+  list.innerHTML="";
+  queue.forEach((p,i)=>{
+    let li=document.createElement("li");
+    li.innerHTML=`
+      <b>${p.name}</b>
+      <span class="tag">${p.mode}</span>
+      <button class="red" onclick="queue.splice(${i},1);save();renderQueue()">Remove</button>
+    `;
+    list.appendChild(li);
+  });
+}
+
+/* ADD PLAYER */
+function addPlayer(tier){
+  let name=document.getElementById("pName").value;
+  let elo=document.getElementById("pElo").value;
+  let role=document.getElementById("role").value;
+  let mode=document.getElementById("mode").value;
+
+  if(!name||!elo)return alert("Fill all");
+
+  leaderboard.push({name,tier,elo,role,mode});
+  save();
+  renderBoard();
+}
+
+/* ROLE */
+function setRole(){
+  if(myRole!=="Owner"&&myRole!=="Manager")return alert("No permission");
+
+  let name=document.getElementById("targetName").value;
+  let role=document.getElementById("newRole").value;
+
+  let p=leaderboard.find(x=>x.name===name);
+  if(!p)return;
+
+  p.role=role;
+  save();
+  renderBoard();
+}
+
+/* REMOVE PLAYER (NEW) */
+function removePlayer(i){
+  if(myRole!=="Owner"&&myRole!=="Manager")return alert("No permission");
+  leaderboard.splice(i,1);
+  save();
+  renderBoard();
+}
+
+/* BOARD */
+function renderBoard(){
+  let list=document.getElementById("board");
+  list.innerHTML="";
+
+  leaderboard.sort((a,b)=>b.elo-a.elo).forEach((p,i)=>{
+    let li=document.createElement("li");
+
+    li.innerHTML=`
+      <b>${p.name}</b>
+      <span class="tag">${p.tier}</span>
+      <span class="tag ${p.role}">${p.role}</span>
+      <span class="tag">${p.mode}</span>
+      <span class="tag">Elo ${p.elo}</span>
+      <button class="red" onclick="removePlayer(${i})">Remove</button>
+    `;
+
+    list.appendChild(li);
+  });
+}
+
+renderReq();
+renderQueue();
+renderBoard();
+
+</script>
+
+</body>
+</html>
