@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Bronz Tierlist</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:radial-gradient(circle at top, #0b1224, #050816);
+  color:white;
+}
+
+/* TOPBAR */
+.topbar{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  height:60px;
+  background:#0f172a;
+  display:flex;
+  align-items:center;
+  padding:0 20px;
+  font-weight:bold;
+  color:#a855f7;
+  z-index:10;
+}
+
+/* SIDEBAR */
+.sidebar{
+  position:fixed;
+  top:60px;
+  left:0;
+  width:230px;
+  height:100%;
+  background:#0b1224;
+  padding:10px;
+}
+
+.sidebar button{
+  width:100%;
+  margin:6px 0;
+  padding:10px;
+  border:none;
+  border-radius:10px;
+  background:#111827;
+  color:white;
+  cursor:pointer;
+}
+
+.sidebar button:hover{
+  background:#1f2937;
+}
+
+/* MAIN */
+.main{
+  margin-left:250px;
+  margin-top:70px;
+  padding:20px;
+}
+
+.card{
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:16px;
+  padding:15px;
+  margin-bottom:15px;
+}
+
+/* INPUTS */
+input,select{
+  width:95%;
+  padding:10px;
+  margin:5px 0;
+  border-radius:10px;
+  border:none;
+  background:#0f172a;
+  color:white;
+}
+
+/* BUTTONS */
+button{
+  padding:10px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.green{background:#22c55e;color:white;}
+.red{background:#ef4444;color:white;}
+
+/* QUEUE */
+.queueCard,.ipCard{
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.1);
+  padding:12px;
+  border-radius:12px;
+  margin:8px 0;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+/* TAGS */
+.tag{
+  padding:4px 8px;
+  border-radius:8px;
+  font-size:11px;
+  margin-left:5px;
+  background:#334155;
+}
+
+/* ROLES */
+.Tester{background:#3b82f6;}
+.Admin{background:#ef4444;}
+.Manager{background:orange;color:black;}
+.Owner{background:gold;color:black;}
+.Player{background:#22c55e;color:black;}
+
+/* HT / LT */
+.HT{background:#22c55e;color:black;font-weight:bold;}
+.LT{background:#3b82f6;color:white;font-weight:bold;}
+
+/* COMBAT */
+.combat{
+  font-weight:bold;
+  margin-left:5px;
+  padding:4px 8px;
+  border-radius:8px;
+}
+
+.ace{background:#38bdf8;color:black;}
+.master{background:#a855f7;}
+.grandmaster{background:gold;color:black;}
+
+/* BOARD */
+.boardItem{
+  background:rgba(255,255,255,0.05);
+  padding:14px;
+  margin:10px 0;
+  border-radius:14px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  cursor:pointer;
+}
+
+.rank{font-size:12px;opacity:0.7;}
+
+/* PROFILE */
+.profileBG{
+  position:fixed;
+  top:0;left:0;
+  width:100%;height:100%;
+  background:rgba(0,0,0,0.7);
+  display:none;
+  justify-content:center;
+  align-items:center;
+}
+
+.profileBox{
+  width:300px;
+  background:#0f172a;
+  padding:20px;
+  border-radius:16px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="topbar">🏆 Bronz Tierlist</div>
+
+<div class="sidebar">
+  <button onclick="show('queue')">Queue</button>
+  <button onclick="show('panel')">Tester Panel</button>
+  <button onclick="show('leaderboard')">Leaderboard</button>
+  <button onclick="show('ips')">Minecraft IPs 🌐</button>
+</div>
+
+<div class="main">
+
+<!-- QUEUE -->
+<div id="queue">
+
+  <div class="card">
+    <h3>🎮 Queue System</h3>
+    <input id="qName" placeholder="Player Name">
+
+    <select id="qMode">
+      <option>Sword</option>
+      <option>Cpvp</option>
+      <option>Mace</option>
+      <option>SMP</option>
+      <option>Pot</option>
+      <option>NethPot</option>
+    </select>
+
+    <button class="green" onclick="joinQueue()">Join Queue</button>
+  </div>
+
+</div>
+
+<!-- PANEL -->
+<div id="panel" style="display:none">
+
+  <div class="card">
+    <h3>⚔ Tester Panel</h3>
+
+    <input id="pName" placeholder="Player Name">
+    <input id="pElo" placeholder="Elo">
+
+    <select id="role">
+      <option>Player</option>
+      <option>Tester</option>
+      <option>Admin</option>
+      <option>Manager</option>
+      <option>Owner</option>
+    </select>
+
+    <select id="mode">
+      <option>Sword</option>
+      <option>Cpvp</option>
+      <option>Mace</option>
+      <option>SMP</option>
+      <option>Pot</option>
+      <option>NethPot</option>
+    </select>
+
+    <select id="tier">
+      <option>HT1</option><option>HT2</option><option>HT3</option>
+      <option>HT4</option><option>HT5</option><option>HT6</option>
+      <option>LT1</option><option>LT2</option><option>LT3</option>
+      <option>LT4</option><option>LT5</option><option>LT6</option>
+    </select>
+
+    <button class="green" onclick="addPlayer()">Submit Test</button>
+  </div>
+
+</div>
+
+<!-- LEADERBOARD -->
+<div id="leaderboard" style="display:none">
+  <div class="card">
+    <h3>📊 Ranked Leaderboard</h3>
+    <div id="board"></div>
+  </div>
+</div>
+
+<!-- IPS -->
+<div id="ips" style="display:none">
+
+  <div class="card">
+    <h3>🌐 Minecraft Servers</h3>
+
+    <select id="ipRole">
+      <option>Player</option>
+      <option>Tester</option>
+      <option>Admin</option>
+      <option>Manager</option>
+      <option>Owner</option>
+    </select>
+
+    <input id="ipName" placeholder="Server Name">
+    <input id="ipAddress" placeholder="Server IP">
+
+    <button class="green" onclick="addIP()">Add Server</button>
+  </div>
+
+</div>
+
+</div>
+
+<!-- PROFILE -->
+<div class="profileBG" id="profileBG" onclick="closeProfile()">
+  <div class="profileBox" onclick="event.stopPropagation()">
+    <h3 id="pTitle"></h3>
+    <p id="pInfo"></p>
+    <button class="red" onclick="closeProfile()">Close</button>
+  </div>
+</div>
+
+<script>
+
+let queue=[], leaderboard=[], ips=[];
+
+/* NAV */
+function show(t){
+  document.querySelectorAll(".main > div").forEach(d=>d.style.display="none");
+  document.getElementById(t).style.display="block";
+}
+
+/* ADD PLAYER */
+function addPlayer(){
+  let name=pName.value, elo=pElo.value, role=role.value, mode=mode.value, tier=tier.value;
+  leaderboard.push({name,elo,role,mode,tier});
+  renderBoard();
+}
+
+/* COMBAT */
+function combat(e){
+  e=Number(e);
+  if(e>=2000) return "grandmaster";
+  if(e>=1500) return "master";
+  if(e>=1000) return "ace";
+  return "";
+}
+
+/* BOARD */
+function renderBoard(){
+  board.innerHTML="";
+  leaderboard.sort((a,b)=>b.elo-a.elo).forEach((p,i)=>{
+
+    let c=combat(p.elo);
+
+    board.innerHTML+=`
+      <div class="boardItem" onclick='openProfile(${JSON.stringify(p)})'>
+        <div>
+          <div class="rank">#${i+1}</div>
+          <b>${p.name}</b>
+          <span class="tag">${p.tier}</span>
+          <span class="tag">${p.role}</span>
+          ${c?`<span class="tag">${c}</span>`:""}
+          <span class="tag">${p.mode}</span>
+          <span class="tag">${p.elo}</span>
+        </div>
+      </div>
+    `;
+  });
+}
+
+/* PROFILE */
+function openProfile(p){
+  profileBG.style.display="flex";
+  pTitle.innerText=p.name;
+  pInfo.innerText=`Role: ${p.role}
+Mode: ${p.mode}
+Tier: ${p.tier}
+Elo: ${p.elo}`;
+}
+
+function closeProfile(){
+  profileBG.style.display="none";
+}
+
+renderBoard();
+
+</script>
+
+</body>
+  </html>
